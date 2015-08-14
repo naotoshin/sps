@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name ="sps" basedir="./" default="deploy">
+
+	<property file="build.properties"/>
+
+	<target name="test">
+		<echo message="${lib.dir}"/>
+		<echo message="${src.dir}"/>
+	</target>
+
+	<target name="clean" description="" depends="">
+		<delete dir="${target.dir}"/>
+		<delete file="${deploy.dir}${sps.war}"/>
+		<delete dir="${deploy.dir}${sps.dir}"/>
+		<mkdir dir="${target.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${target_lib.dir}"/>
+
+
+	</target>
+
+
+	<path id="myclasspath">
+	  <!-- libディレクトリ以下のincludeで指定したファイルをmyclasspath
+	          に含める。-->
+	  <fileset dir="${lib.dir}">
+	    <!-- 全てのjarファイルをクラスパスに含める -->
+	    <include name="*.jar"/>
+	    <include name="javax.validation-1.0.0.GA.jar"/>
+	  </fileset>
+
+	</path>
+
+	<target name="build" description="" depends="clean">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="myclasspath" encoding="UTF8"/>
+		<copy todir="${target_lib.dir}">
+			  <fileset dir="${lib.dir}">
+			    <include name="*.jar"/>
+			  </fileset>
+		</copy>
+		<copy todir="${target_web_inf.dir}" file="${web.xml}"/>
+		<copy todir="${target_meta_inf.dir}">
+			<fileset dir="${meta_inf.dir}"/>
+		</copy>
+		<copy todir="${target_meta_inf.dir}">
+					<fileset dir="${webapps.dir}"/>
+		</copy>
+
+	</target>
+
+	<target name="war" depends="build">
+		<war basedir="${target.dir}" jarfile="${sps.war}"/>
+	</target>
+
+	<target name="deploy" description="" depends="war">
+		<move file="${sps.war}" todir="${deploy.dir}"/>
+	</target>
+
+
+</project>
